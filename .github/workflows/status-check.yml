@@ -14,6 +14,9 @@ on:
       - '.github/workflows/status-check.yml'
       - '.github/scripts/status-check.sh'
 
+permissions:
+  contents: write
+
 jobs:
   check-status:
     runs-on: ubuntu-latest
