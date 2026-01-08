@@ -31,16 +31,17 @@ check_api() {
   local name=$1
   local url=$2
   
-  echo -e "${YELLOW}Checking $name ($url)...${NC}"
+  # Send colored logs to stderr so only the plain status is captured
+  echo -e "${YELLOW}Checking $name ($url)...${NC}" >&2
   
   # Make HTTP request with timeout
   response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
   
   if [ "$response" = "200" ]; then
-    echo -e "${GREEN}✅ $name is operational${NC}"
+    echo -e "${GREEN}✅ $name is operational${NC}" >&2
     echo "operational"
   else
-    echo -e "${RED}❌ $name is down (HTTP $response)${NC}"
+    echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
     echo "down"
   fi
 }
@@ -113,7 +114,7 @@ EOF
     --data "$slack_payload" \
     "$SLACK_WEBHOOK_URL" 2>/dev/null || echo "⚠️  Failed to send Slack notification"
   
-  echo -e "${GREEN}📧 Slack notification sent for $service_name${NC}"
+  echo -e "${GREEN}📧 Slack notification sent for $service_name${NC}" >&2
 }
 
 # Function to load previous status
@@ -163,9 +164,9 @@ for api in "${apis[@]}"; do
     echo -e "${YELLOW}⚠️  Status changed for $name: $previous_status_for_api → $status${NC}"
     send_slack_notification "$name" "$previous_status_for_api" "$status"
   elif [ -z "$previous_status_for_api" ]; then
-    echo -e "${YELLOW}ℹ️  First check for $name (no notification)${NC}"
+    echo -e "${YELLOW}ℹ️  First check for $name (no notification)${NC}" >&2
   else
-    echo -e "${GREEN}✓ Status unchanged for $name${NC}"
+    echo -e "${GREEN}✓ Status unchanged for $name${NC}" >&2
   fi
   
   # Add to services array
