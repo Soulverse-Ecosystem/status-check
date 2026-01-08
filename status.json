@@ -1,12 +1,4 @@
 {
-  "updatedAt": "2026-01-08T06:53:04.000Z",
-  "services": [{"name":"API","status":"[1;33mChecking API (https://api.example.com/health)...[0m
-[0;31m❌ API is down (HTTP 000000)[0m
-down"},{"name":"Auth","status":"[1;33mChecking Auth (https://auth.example.com/health)...[0m
-[0;31m❌ Auth is down (HTTP 000000)[0m
-down"},{"name":"Database","status":"[1;33mChecking Database (https://db.example.com/health)...[0m
-[0;31m❌ Database is down (HTTP 000000)[0m
-down"},{"name":"Payment","status":"[1;33mChecking Payment (https://payment.example.com/health)...[0m
-[0;31m❌ Payment is down (HTTP 000000)[0m
-down"}]
+  "updatedAt": "2026-01-08T07:05:12.000Z",
+  "services": [{"name":"API","status":"down"},{"name":"Auth","status":"down"},{"name":"Database","status":"down"},{"name":"Payment","status":"down"}]
 }

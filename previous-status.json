@@ -1,9 +1,1 @@
-{"API":"[1;33mChecking API (https://api.example.com/health)...[0m
-[0;31m❌ API is down (HTTP 000000)[0m
-down","Payment":"[1;33mChecking Payment (https://payment.example.com/health)...[0m
-[0;31m❌ Payment is down (HTTP 000000)[0m
-down","Auth":"[1;33mChecking Auth (https://auth.example.com/health)...[0m
-[0;31m❌ Auth is down (HTTP 000000)[0m
-down","Database":"[1;33mChecking Database (https://db.example.com/health)...[0m
-[0;31m❌ Database is down (HTTP 000000)[0m
-down"}
+{"API":"down","Payment":"down","Auth":"down","Database":"down"}
