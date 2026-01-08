@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Status Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .last-updated {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 30px;
+        }
+
+        .status-list {
+            list-style: none;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ddd;
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-item.operational {
+            border-left-color: #10b981;
+        }
+
+        .status-item.down {
+            border-left-color: #ef4444;
+        }
+
+        .status-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .service-name {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .service-status {
+            font-size: 1em;
+            color: #666;
+            text-transform: capitalize;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ef4444;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Service Status</h1>
+        <div id="last-updated" class="last-updated">Loading...</div>
+        <ul id="status-list" class="status-list">
+            <li class="loading">Loading status...</li>
+        </ul>
+    </div>
+
+    <script>
+        async function fetchStatus() {
+            try {
+                // Add cache busting to ensure fresh data
+                const response = await fetch('status.json?' + new Date().getTime());
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                displayStatus(data);
+            } catch (error) {
+                console.error('Error fetching status:', error);
+                document.getElementById('status-list').innerHTML = 
+                    '<li class="error">Unable to load status. Please try again later.</li>';
+            }
+        }
+
+        function displayStatus(data) {
+            const statusList = document.getElementById('status-list');
+            const lastUpdated = document.getElementById('last-updated');
+            
+            // Update last updated time
+            if (data.updatedAt) {
+                const date = new Date(data.updatedAt);
+                lastUpdated.textContent = `Last updated: ${date.toLocaleString()}`;
+            }
+            
+            // Clear loading message
+            statusList.innerHTML = '';
+            
+            // Display each service
+            if (data.services && data.services.length > 0) {
+                data.services.forEach(service => {
+                    const li = document.createElement('li');
+                    li.className = `status-item ${service.status}`;
+                    
+                    const icon = service.status === 'operational' ? '🟢' : '🔴';
+                    const statusText = service.status === 'operational' ? 'Operational' : 'Down';
+                    
+                    li.innerHTML = `
+                        <span class="status-icon">${icon}</span>
+                        <span class="service-name">${service.name}</span>
+                        <span class="service-status">${statusText}</span>
+                    `;
+                    
+                    statusList.appendChild(li);
+                });
+            } else {
+                statusList.innerHTML = '<li class="error">No services found in status data.</li>';
+            }
+        }
+
+        // Fetch status on page load
+        fetchStatus();
+        
+        // Auto-refresh every 30 seconds
+        setInterval(fetchStatus, 30000);
+    </script>
+</body>
+</html>
+

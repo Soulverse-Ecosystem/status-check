@@ -1,0 +1,62 @@
+name: API Status Check and Slack Notification
+
+on:
+  schedule:
+    # Run every 5 minutes
+    - cron: '*/5 * * * *'
+  # Allow manual triggering
+  workflow_dispatch:
+  # Run on push to main (optional, for testing)
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/status-check.yml'
+      - '.github/scripts/status-check.sh'
+
+jobs:
+  check-status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Fetch full history for comparison
+      
+      - name: Make script executable
+        run: chmod +x .github/scripts/status-check.sh
+      
+      - name: Check API Status
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: bash .github/scripts/status-check.sh
+      
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Check if there are changes to commit
+          if git diff --quiet && git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git add status.json previous-status.json
+            git commit -m "Update status page - $(date +'%Y-%m-%d %H:%M:%S UTC')" || exit 0
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Upload status files as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: status-files
+          path: |
+            status.json
+            previous-status.json
+          retention-days: 7
+          if-no-files-found: ignore
+
