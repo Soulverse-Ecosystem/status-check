@@ -1,4 +1,4 @@
 {
-  "updatedAt": "2026-01-08T07:05:12.000Z",
+  "updatedAt": "2026-01-08T07:13:47.000Z",
   "services": [{"name":"API","status":"down"},{"name":"Auth","status":"down"},{"name":"Database","status":"down"},{"name":"Payment","status":"down"}]
 }
