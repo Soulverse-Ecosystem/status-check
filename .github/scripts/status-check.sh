@@ -186,31 +186,19 @@ check_api() {
   # 301, 302 - Redirect (service is up)
   # 400 - Bad Request (service is up, but needs proper payload/auth)
   # 401, 403 - Unauthorized/Forbidden (service is up, but needs auth)
-  # 404 - Not Found (endpoint doesn't exist OR service is down)
-  #     For POST/PUT/PATCH: 404 might mean endpoint exists but needs proper path/ID
-  #     For GET: 404 usually means endpoint doesn't exist or needs auth
+  # 404 - Not Found (endpoint doesn't exist OR service is down) - treat as DOWN
   # 405 - Method Not Allowed (endpoint exists but wrong method - service is up)
   # 500, 502, 503, 504 - Server errors (service is down)
   # 000 - Timeout/Connection error (service is down)
   
-  # For POST/PUT/PATCH, also consider 404 as potentially operational (endpoint might need proper ID/path)
-  if [[ "$method" =~ ^(POST|PUT|PATCH)$ ]]; then
-    if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|404|405)$ ]]; then
-      echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
-      echo "operational"
-    else
-      echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
-      echo "down"
-    fi
+  # All methods: 404 means endpoint doesn't exist or isn't accessible (treat as down)
+  # 400, 401, 403, 405 indicate service is up but needs proper payload/auth/method
+  if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|405)$ ]]; then
+    echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
+    echo "operational"
   else
-    # For GET requests, 404 means endpoint doesn't exist (treat as down)
-    if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|405)$ ]]; then
-      echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
-      echo "operational"
-    else
-      echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
-      echo "down"
-    fi
+    echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
+    echo "down"
   fi
 }
 

@@ -14,9 +14,6 @@ on:
       - '.github/workflows/status-check.yml'
       - '.github/scripts/status-check.sh'
 
-permissions:
-  contents: write
-
 jobs:
   check-status:
     runs-on: ubuntu-latest
@@ -35,6 +32,11 @@ jobs:
       - name: Check API Status
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          # Optional: Add authentication if API requires it
+          # Uncomment and set the appropriate secret:
+          # API_KEY: ${{ secrets.API_KEY }}
+          # API_TOKEN: ${{ secrets.API_TOKEN }}
+          # AUTH_HEADER: ${{ secrets.AUTH_HEADER }}
         run: bash .github/scripts/status-check.sh
       
       - name: Commit and Push Changes
