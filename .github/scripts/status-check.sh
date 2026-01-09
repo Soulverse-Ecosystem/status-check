@@ -11,6 +11,12 @@ STATUS_FILE="status.json"
 PREVIOUS_STATUS_FILE="previous-status.json"
 SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
+# Optional: API Authentication (if your API requires it)
+# Set these as GitHub Secrets if needed:
+# API_KEY="${API_KEY:-}"
+# API_TOKEN="${API_TOKEN:-}"
+# AUTH_HEADER="${AUTH_HEADER:-}"  # e.g., "Bearer token" or "ApiKey key"
+
 # Define your API endpoints here
 # Format: "Service Name|URL"
 # 
@@ -110,14 +116,32 @@ check_api() {
     url="${url}?page=1&pageSize=1"
   fi
   
+  # Build curl headers array for authentication
+  local curl_headers=()
+  
+  # Add authentication headers if provided
+  if [ -n "$API_KEY" ]; then
+    curl_headers+=("-H" "X-API-Key: $API_KEY")
+  fi
+  if [ -n "$API_TOKEN" ]; then
+    curl_headers+=("-H" "Authorization: Bearer $API_TOKEN")
+  fi
+  if [ -n "$AUTH_HEADER" ]; then
+    curl_headers+=("-H" "Authorization: $AUTH_HEADER")
+  fi
+  
   # Make HTTP request based on method
   local response="000"
   
   case "$method" in
     "GET")
       # Use HEAD request first (lighter), fallback to GET if HEAD not allowed
-      response=$(curl -s -I -o /dev/null -w "%{http_code}" --max-time $TIMEOUT -X HEAD "$url" 2>/dev/null || \
-                 curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
+      response=$(curl -s -I -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                 "${curl_headers[@]}" \
+                 -X HEAD "$url" 2>/dev/null || \
+                 curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                 "${curl_headers[@]}" \
+                 "$url" 2>/dev/null || echo "000")
       ;;
     "POST"|"PUT"|"PATCH")
       # For POST/PUT/PATCH, send minimal payload and check response
@@ -126,6 +150,7 @@ check_api() {
       # 500/503 means service is down
       if [ -n "$payload" ]; then
         response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                   "${curl_headers[@]}" \
                    -X "$method" \
                    -H "Content-Type: application/json" \
                    -d "$payload" \
@@ -133,6 +158,7 @@ check_api() {
       else
         # Try with empty JSON payload
         response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                   "${curl_headers[@]}" \
                    -X "$method" \
                    -H "Content-Type: application/json" \
                    -d "{}" \
@@ -143,12 +169,15 @@ check_api() {
       # For DELETE, try with a test ID or check if endpoint responds
       # Many DELETE endpoints need an ID, so we check if we get 400/404 (endpoint exists) vs 500 (down)
       response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                 "${curl_headers[@]}" \
                  -X "$method" \
                  "$url" 2>/dev/null || echo "000")
       ;;
     *)
       # Default to GET
-      response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
+      response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                 "${curl_headers[@]}" \
+                 "$url" 2>/dev/null || echo "000")
       ;;
   esac
   
@@ -157,16 +186,31 @@ check_api() {
   # 301, 302 - Redirect (service is up)
   # 400 - Bad Request (service is up, but needs proper payload/auth)
   # 401, 403 - Unauthorized/Forbidden (service is up, but needs auth)
-  # 404 - Not Found (could mean endpoint doesn't exist OR service is down - we'll treat as down for safety)
+  # 404 - Not Found (endpoint doesn't exist OR service is down)
+  #     For POST/PUT/PATCH: 404 might mean endpoint exists but needs proper path/ID
+  #     For GET: 404 usually means endpoint doesn't exist or needs auth
+  # 405 - Method Not Allowed (endpoint exists but wrong method - service is up)
   # 500, 502, 503, 504 - Server errors (service is down)
   # 000 - Timeout/Connection error (service is down)
   
-  if [[ "$response" =~ ^(200|201|204|301|302|400|401|403)$ ]]; then
-    echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
-    echo "operational"
+  # For POST/PUT/PATCH, also consider 404 as potentially operational (endpoint might need proper ID/path)
+  if [[ "$method" =~ ^(POST|PUT|PATCH)$ ]]; then
+    if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|404|405)$ ]]; then
+      echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
+      echo "operational"
+    else
+      echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
+      echo "down"
+    fi
   else
-    echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
-    echo "down"
+    # For GET requests, 404 means endpoint doesn't exist (treat as down)
+    if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|405)$ ]]; then
+      echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
+      echo "operational"
+    else
+      echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
+      echo "down"
+    fi
   fi
 }
 
