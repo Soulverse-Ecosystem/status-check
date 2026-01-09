@@ -211,7 +211,12 @@ send_slack_notification() {
   local old_status=$2
   local new_status=$3
   local status_code=${4:-"N/A"}
-  local timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+  
+  # Get Unix timestamp (seconds since epoch) for Slack date formatting
+  local unix_timestamp=$(date +%s)
+  
+  # Format UTC time as fallback (for display if date parsing fails)
+  local timestamp_utc=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
   
   if [ -z "$SLACK_WEBHOOK_URL" ]; then
     echo "⚠️  SLACK_WEBHOOK_URL not set, skipping notification"
@@ -222,18 +227,23 @@ send_slack_notification() {
   local title=""
   local message=""
   
+  # Slack date formatting: <!date^unix_timestamp^format|fallback>
+  # Format options: {date_num}, {date}, {date_short}, {date_long}, {date_pretty}, {date_short_pretty}, {time}, {time_secs}
+  # Using {date_short_pretty} at {time} for readable format like "Jan 9, 2026 at 10:53 AM"
+  local slack_date="<!date^${unix_timestamp}^{date_short_pretty} at {time}|${timestamp_utc}>"
+  
   if [ "$old_status" = "operational" ] && [ "$new_status" = "down" ]; then
     emoji="🔴"
     title="Service Alert - DOWN"
-    message="*${service_name}* is now *DOWN*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
+    message="*${service_name}* is now *DOWN*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${slack_date}"
   elif [ "$old_status" = "down" ] && [ "$new_status" = "operational" ]; then
     emoji="🟢"
     title="Service Recovered"
-    message="*${service_name}* is now *OPERATIONAL*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
+    message="*${service_name}* is now *OPERATIONAL*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${slack_date}"
   else
     emoji="⚠️"
     title="Status Change"
-    message="*${service_name}* status changed from *${old_status}* to *${new_status}*\n\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
+    message="*${service_name}* status changed from *${old_status}* to *${new_status}*\n\nHTTP Status Code: ${status_code}\nTime: ${slack_date}"
   fi
   
   # Format Slack message using Block Kit
@@ -260,7 +270,7 @@ send_slack_notification() {
       "elements": [
         {
           "type": "mrkdwn",
-          "text": "Updated: ${timestamp}"
+          "text": "Updated: ${slack_date}"
         }
       ]
     }

@@ -9,7 +9,6 @@ This solution:
 - ✅ Compares current status with previous status
 - ✅ Updates GitHub Pages status page automatically
 - ✅ Sends Slack notifications **only when status changes**
-- ✅ **No n8n needed** - Runs entirely on GitHub
 - ✅ **100% free** - GitHub Actions + Slack webhooks
 
 ## Cost: $0/month
@@ -47,8 +46,6 @@ Commit and Push (triggers GitHub Pages update)
    - Access to create webhooks
    - See `SLACK_SETUP.md` for setup
 
-3. **No n8n Required!**
-   - Everything runs on GitHub Actions
 
 ##  Quick Start
 
@@ -213,11 +210,10 @@ The status page (`index.html`):
 
 1. **100% Free** - No server costs
 2. **No Maintenance** - Fully managed by GitHub
-3. **No n8n Needed** - Runs entirely on GitHub
-4. **Reliable** - GitHub's infrastructure
-5. **Easy Setup** - Just YAML and bash scripts
-6. **Version Controlled** - All code in git
-7. **Scalable** - Handles many APIs
+3. **Reliable** - GitHub's infrastructure
+4. **Easy Setup** - Just YAML and bash scripts
+5. **Version Controlled** - All code in git
+6. **Scalable** - Handles many APIs
 
 ##  vs n8n Solution
 
