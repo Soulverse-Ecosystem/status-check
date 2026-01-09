@@ -54,7 +54,7 @@ apis=(
   "Soulverse Auth Logger Attempts|https://api-gateway.soulverse.us/auth-logger/attempts|GET"
   "Soulverse Auth Logger Daily Report|https://api-gateway.soulverse.us/auth-logger/daily-report|GET"
   "Soulverse Auth Logger Monthly Report|https://api-gateway.soulverse.us/auth-logger/monthly-report|GET"
-  "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/auth-logger/trace?trace=trace-456|GET"
+  "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/auth-logger/trace?traceId=trace-456|GET"
   "Soulverse Auth Logger Weekly Report|https://api-gateway.soulverse.us/auth-logger/weekly-report|GET"
   
   # Trust Registry Service (GET endpoints)
