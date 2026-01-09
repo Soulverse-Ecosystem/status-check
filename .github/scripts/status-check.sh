@@ -13,11 +13,75 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 
 # Define your API endpoints here
 # Format: "Service Name|URL"
+# 
+# To add all APIs from https://api-gateway.soulverse.us/api#/:
+# 1. Visit the Swagger documentation page
+# 2. Expand each API section to see all endpoints
+# 3. For each endpoint, add a health check URL
+# 4. Common patterns: /health, /status, /ping, or the base endpoint path
+#
+# Soulverse API Gateway endpoints
 apis=(
-  "API|https://api.example.com/health"
-  "Auth|https://auth.example.com/health"
-  "Database|https://db.example.com/health"
-  "Payment|https://payment.example.com/health"
+  # Base API Gateway Health Checks
+  "Soulverse API Gateway|https://api-gateway.soulverse.us/health"
+  "Soulverse API Gateway Root|https://api-gateway.soulverse.us/"
+  
+  # News Service
+  "Soulverse News|https://api-gateway.soulverse.us/api/news"
+  "Soulverse News Providers|https://api-gateway.soulverse.us/api/news/providers"
+  "Soulverse News Categories|https://api-gateway.soulverse.us/api/news/categories"
+  
+  # LinkedIn Service
+  "Soulverse LinkedIn Authorization|https://api-gateway.soulverse.us/api/linkedin/authorization"
+  "Soulverse LinkedIn Company Posts|https://api-gateway.soulverse.us/api/linkedin/company-posts"
+  
+  # Backup and Recovery Service
+  "Soulverse Backup Recovery|https://api-gateway.soulverse.us/api/BackupAndRecovery/upload"
+  
+  # SoulId Service
+  "Soulverse SoulId|https://api-gateway.soulverse.us/api/soul-id"
+  "Soulverse SoulId Link Address|https://api-gateway.soulverse.us/api/soul-id/link-address"
+  
+  # Organizations Service
+  "Soulverse Organizations|https://api-gateway.soulverse.us/api/organizations"
+  "Soulverse Organizations Tags|https://api-gateway.soulverse.us/api/organizations/credential-tag"
+  
+  # App Config Service
+  "Soulverse App Version|https://api-gateway.soulverse.us/api/app-config/app-version"
+  "Soulverse App Constant|https://api-gateway.soulverse.us/api/app-config/app-constant"
+  "Soulverse Mobile App Constant|https://api-gateway.soulverse.us/api/app-config/mobile-app-constant"
+  
+  # Auth Logger Service
+  "Soulverse Auth Logger|https://api-gateway.soulverse.us/api/auth-logger/log"
+  "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/api/auth-logger/trace"
+  "Soulverse Auth Logger Daily Report|https://api-gateway.soulverse.us/api/auth-logger/daily-report"
+  "Soulverse Auth Logger Attempts|https://api-gateway.soulverse.us/api/auth-logger/attempts"
+  "Soulverse Auth Logger Monthly Report|https://api-gateway.soulverse.us/api/auth-logger/monthly-report"
+  "Soulverse Auth Logger Weekly Report|https://api-gateway.soulverse.us/api/auth-logger/weekly-report"
+  
+  # SoulScan Service (Important: includes health-check endpoint)
+  "Soulverse SoulScan Health Check|https://api-gateway.soulverse.us/api/soulscan/health-check"
+  "Soulverse SoulScan Login|https://api-gateway.soulverse.us/api/soulscan/login"
+  "Soulverse SoulScan Register|https://api-gateway.soulverse.us/api/soulscan/register"
+  "Soulverse SoulScan Validate Face|https://api-gateway.soulverse.us/api/soulscan/validate-face"
+  
+  # Store Login Service
+  "Soulverse Store Login|https://api-gateway.soulverse.us/api/store-login"
+  
+  # Trust Registry Service
+  "Soulverse Trust Registry|https://api-gateway.soulverse.us/api/trust-registry/get-all-entities"
+  "Soulverse Trust Registry Add Entity|https://api-gateway.soulverse.us/api/trust-registry/add-entity"
+  
+  # Additional SoulId Endpoints
+  "Soulverse SoulId Payment Detail|https://api-gateway.soulverse.us/api/soul-id/payment-detail"
+  "Soulverse SoulId Recover|https://api-gateway.soulverse.us/api/soul-id/recover"
+  "Soulverse SoulId Delete|https://api-gateway.soulverse.us/api/soul-id/delete"
+  
+  # Additional LinkedIn Endpoint
+  "Soulverse LinkedIn Callback|https://api-gateway.soulverse.us/api/linkedin/callback"
+  
+  # Additional Organizations Endpoint
+  "Soulverse Organizations By ID|https://api-gateway.soulverse.us/api/organizations"
 )
 
 # Colors for output

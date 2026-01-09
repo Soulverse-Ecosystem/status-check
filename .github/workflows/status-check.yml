@@ -3,7 +3,7 @@ name: API Status Check and Slack Notification
 on:
   schedule:
     # Run every 5 minutes
-    #####- cron: '*/5 * * * *'
+    - cron: '*/5 * * * *'
   # Allow manual triggering
   workflow_dispatch:
   # Run on push to main (optional, for testing)
