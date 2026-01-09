@@ -1,4 +1,4 @@
-# GitHub Actions + Slack Monitoring (No n8n)
+# GitHub Actions + Slack Monitoring
 
 A complete **100% free** solution using GitHub Actions to monitor APIs, update GitHub Pages status page, and send Slack notifications.
 
@@ -106,9 +106,6 @@ github-actions-slack/
 │   └── scripts/
 │       └── status-check.sh           # API checking script
 ├── index.html                         # Status page HTML
-├── SLACK_SETUP.md                     # Slack webhook setup
-├── CONFIGURATION.md                   # Detailed configuration guide
-└── TESTING.md                         # Testing guide
 ```
 
 ##  How It Works
