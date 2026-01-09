@@ -2,8 +2,9 @@ name: API Status Check and Slack Notification
 
 on:
   schedule:
-    # Run every 3 minutes
-    - cron: '*/3 * * * *'
+    # Run every 5 minutes (GitHub Actions runs on UTC time)
+    # Format: minute hour day month day-of-week
+    - cron: '*/5 * * * *'
   # Allow manual triggering
   workflow_dispatch:
   # Run on push to main (optional, for testing)
@@ -13,6 +14,9 @@ on:
     paths:
       - '.github/workflows/status-check.yml'
       - '.github/scripts/status-check.sh'
+      - 'status.json'
+      - 'previous-status.json'
+
 permissions:
   contents: write
 

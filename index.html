@@ -115,6 +115,13 @@
             background: rgba(0, 0, 0, 0.05);
             border-radius: 4px;
             display: inline-block;
+            font-family: 'Monaco', 'Courier New', monospace;
+        }
+        
+        .service-status::before {
+            content: '';
+            display: inline-block;
+            margin-right: 4px;
         }
 
         .loading {
@@ -191,12 +198,16 @@
                     const icon = service.status === 'operational' ? '🟢' : '🔴';
                     const statusText = service.status === 'operational' ? 'Operational' : 'Down';
                     
+                    // Get status code and format it
+                    const statusCode = service.statusCode || 'N/A';
+                    const statusCodeText = statusCode !== 'N/A' ? ` (HTTP ${statusCode})` : '';
+                    
                     li.innerHTML = `
                         <div class="status-header">
                             <span class="status-icon">${icon}</span>
                             <span class="service-name">${service.name}</span>
                         </div>
-                        <span class="service-status">${statusText}</span>
+                        <span class="service-status">${statusText}${statusCodeText}</span>
                     `;
                     
                     statusList.appendChild(li);

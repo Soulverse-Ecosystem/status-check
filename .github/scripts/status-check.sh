@@ -27,71 +27,74 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 # 4. Common patterns: /health, /status, /ping, or the base endpoint path
 #
 # Soulverse API Gateway endpoints
+# Extracted from Swagger documentation: https://api-gateway.soulverse.us/api#/
+# NOTE: Endpoints do NOT use /api prefix - they're directly under the root domain
+
 apis=(
   # Base API Gateway Health Checks
-  "Soulverse API Gateway|https://api-gateway.soulverse.us/health"
   "Soulverse API Gateway Root|https://api-gateway.soulverse.us/api"
   
-  # News Service (GET endpoints - these should work)
-  "Soulverse News|https://api-gateway.soulverse.us/api/news?page=1&pageSize=1"
-  "Soulverse News Providers|https://api-gateway.soulverse.us/api/news/providers"
-  "Soulverse News Categories|https://api-gateway.soulverse.us/api/news/categories"
+  # News Service (GET endpoints - tested and working)
+  "Soulverse News|https://api-gateway.soulverse.us/news|GET"
+  "Soulverse News Providers|https://api-gateway.soulverse.us/news/providers|GET"
+  "Soulverse News Categories|https://api-gateway.soulverse.us/news/categories|GET"
   
   # LinkedIn Service (GET endpoints)
-  "Soulverse LinkedIn Authorization|https://api-gateway.soulverse.us/api/linkedin/authorization"
-  "Soulverse LinkedIn Company Posts|https://api-gateway.soulverse.us/api/linkedin/company-posts"
-  "Soulverse LinkedIn Callback|https://api-gateway.soulverse.us/api/linkedin/callback?code=test&state=test"
+  "Soulverse LinkedIn Authorization|https://api-gateway.soulverse.us/linkedin/authorization|GET"
+  "Soulverse LinkedIn Company Posts|https://api-gateway.soulverse.us/linkedin/company-posts|GET"
+  "Soulverse LinkedIn Callback|https://api-gateway.soulverse.us/linkedin/callback|GET"
   
   # Organizations Service (GET endpoints)
-  "Soulverse Organizations|https://api-gateway.soulverse.us/api/organizations"
-  "Soulverse Organizations Tags|https://api-gateway.soulverse.us/api/organizations/credential-tag"
+  "Soulverse Organizations Credential Tag|https://api-gateway.soulverse.us/organizations/credential-tag|GET"
   
   # App Config Service (GET endpoints)
-  "Soulverse App Version|https://api-gateway.soulverse.us/api/app-config/app-version"
-  "Soulverse App Constant|https://api-gateway.soulverse.us/api/app-config/app-constant"
-  "Soulverse Mobile App Constant|https://api-gateway.soulverse.us/api/app-config/mobile-app-constant"
+  "Soulverse Mobile App Constant|https://api-gateway.soulverse.us/app-config/mobile-app-constant|GET"
   
   # Auth Logger Service (GET endpoints)
-  "Soulverse Auth Logger|https://api-gateway.soulverse.us/api/auth-logger/log"
-  "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/api/auth-logger/trace"
-  "Soulverse Auth Logger Daily Report|https://api-gateway.soulverse.us/api/auth-logger/daily-report"
-  "Soulverse Auth Logger Attempts|https://api-gateway.soulverse.us/api/auth-logger/attempts"
-  "Soulverse Auth Logger Monthly Report|https://api-gateway.soulverse.us/api/auth-logger/monthly-report"
-  "Soulverse Auth Logger Weekly Report|https://api-gateway.soulverse.us/api/auth-logger/weekly-report"
-  
-  # SoulScan Service (includes health-check endpoint)
-  "Soulverse SoulScan Health Check|https://api-gateway.soulverse.us/api/soulscan/health-check"
+  "Soulverse Auth Logger Attempts|https://api-gateway.soulverse.us/auth-logger/attempts|GET"
+  "Soulverse Auth Logger Daily Report|https://api-gateway.soulverse.us/auth-logger/daily-report|GET"
+  "Soulverse Auth Logger Monthly Report|https://api-gateway.soulverse.us/auth-logger/monthly-report|GET"
+  "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/auth-logger/trace|GET"
+  "Soulverse Auth Logger Weekly Report|https://api-gateway.soulverse.us/auth-logger/weekly-report|GET"
   
   # Trust Registry Service (GET endpoints)
-  "Soulverse Trust Registry|https://api-gateway.soulverse.us/api/trust-registry/get-all-entities"
+  "Soulverse Trust Registry Get All Entities|https://api-gateway.soulverse.us/trust-registry/get-all-entities|GET"
   
-  # POST/PUT/DELETE endpoints - monitored with appropriate HTTP methods
+  # POST/PUT/PATCH/DELETE endpoints - monitored with appropriate HTTP methods
   # These endpoints are checked with minimal payloads to verify service availability
   # 400/401/403 responses mean service is operational (needs proper payload/auth)
-  # 500/503/000 responses mean service is down
+  # 404/500/503/000 responses mean service is down
   
-  # Backup and Recovery Service (POST)
-  "Soulverse Backup Recovery Upload|https://api-gateway.soulverse.us/api/BackupAndRecovery/upload|POST"
+  # Backup and Recovery Service
+  "Soulverse Backup Recovery Upload|https://api-gateway.soulverse.us/BackupAndRecovery/upload|POST"
   
-  # SoulId Service (POST/PATCH/DELETE)
-  "Soulverse SoulId Create|https://api-gateway.soulverse.us/api/soul-id|POST|{\"soulId\":\"test.soul\",\"purchase\":{}}"
-  "Soulverse SoulId Link Address|https://api-gateway.soulverse.us/api/soul-id/link-address|POST|{\"soulId\":\"test.soul\",\"addresses\":[]}"
-  "Soulverse SoulId Payment Detail|https://api-gateway.soulverse.us/api/soul-id/payment-detail|PATCH|{\"soulId\":\"test.soul\",\"purchase\":{}}"
-  "Soulverse SoulId Recover|https://api-gateway.soulverse.us/api/soul-id/recover|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
+  # App Config Service (POST endpoints)
+  "Soulverse App Config Constant|https://api-gateway.soulverse.us/app-config/app-constant|POST"
+  "Soulverse App Config Version|https://api-gateway.soulverse.us/app-config/app-version|POST"
   
-  # SoulScan Service (POST)
-  "Soulverse SoulScan Login|https://api-gateway.soulverse.us/api/soulscan/login|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
-  "Soulverse SoulScan Register|https://api-gateway.soulverse.us/api/soulscan/register|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
-  "Soulverse SoulScan Validate Face|https://api-gateway.soulverse.us/api/soulscan/validate-face|POST|{\"image\":\"test\"}"
+  # Auth Logger Service (POST)
+  "Soulverse Auth Logger Log|https://api-gateway.soulverse.us/auth-logger/log|POST"
   
-  # Store Login Service (POST)
-  "Soulverse Store Login|https://api-gateway.soulverse.us/api/store-login|POST|{\"username\":\"test\",\"password\":\"test\"}"
+  # SoulId Service
+  "Soulverse SoulId Create|https://api-gateway.soulverse.us/soul-id|POST"
+  "Soulverse SoulId Link Address|https://api-gateway.soulverse.us/soul-id/link-address|POST"
+  "Soulverse SoulId Payment Detail|https://api-gateway.soulverse.us/soul-id/payment-detail|PATCH"
+  "Soulverse SoulId Recover|https://api-gateway.soulverse.us/soul-id/recover|POST"
   
-  # Trust Registry Service (POST)
-  "Soulverse Trust Registry Add Entity|https://api-gateway.soulverse.us/api/trust-registry/add-entity|POST|{\"orgId\":\"test\",\"type\":\"ISSUER\",\"orgDid\":\"test\",\"serviceEndpoint\":\"https://test.com\",\"schemaIds\":[],\"credentialDefinitionIds\":[]}"
+  # SoulScan Service
+  "Soulverse SoulScan Health Check|https://api-gateway.soulverse.us/soulscan/health-check|POST"
+  "Soulverse SoulScan Login|https://api-gateway.soulverse.us/soulscan/login|POST"
+  "Soulverse SoulScan Register|https://api-gateway.soulverse.us/soulscan/register|POST"
+  "Soulverse SoulScan Validate Face|https://api-gateway.soulverse.us/soulscan/validate-face|POST"
   
-  # Organizations Service (POST)
-  "Soulverse Organizations Create|https://api-gateway.soulverse.us/api/organizations|POST"
+  # Store Login Service
+  "Soulverse Store Login|https://api-gateway.soulverse.us/store-login|POST"
+  
+  # Trust Registry Service
+  "Soulverse Trust Registry Add Entity|https://api-gateway.soulverse.us/trust-registry/add-entity|POST"
+  
+  # Organizations Service
+  "Soulverse Organizations Create|https://api-gateway.soulverse.us/organizations|POST"
 )
 
 # Colors for output
@@ -112,7 +115,7 @@ check_api() {
   
   # For endpoints that might need query parameters, try with minimal params
   # News endpoint needs query parameters
-  if [[ "$url" == *"/api/news" ]] && [[ "$url" != *"?"* ]] && [[ "$method" == "GET" ]]; then
+  if [[ "$url" == *"/news" ]] && [[ "$url" != *"?"* ]] && [[ "$method" == "GET" ]] && [[ "$url" != *"/news/providers" ]] && [[ "$url" != *"/news/categories" ]]; then
     url="${url}?page=1&pageSize=1"
   fi
   
@@ -182,23 +185,23 @@ check_api() {
   esac
   
   # Consider these as "operational" (service is responding):
-  # 200, 201, 204 - Success
-  # 301, 302 - Redirect (service is up)
-  # 400 - Bad Request (service is up, but needs proper payload/auth)
-  # 401, 403 - Unauthorized/Forbidden (service is up, but needs auth)
-  # 404 - Not Found (endpoint doesn't exist OR service is down) - treat as DOWN
-  # 405 - Method Not Allowed (endpoint exists but wrong method - service is up)
-  # 500, 502, 503, 504 - Server errors (service is down)
-  # 000 - Timeout/Connection error (service is down)
+  # 200-299: Success responses (service is operational)
+  # 300-399: Redirects (service is up and redirecting)
+  # 400-403: Client errors indicating service is responding:
+  #   - 400: Bad Request (service is up, but needs proper payload)
+  #   - 401: Unauthorized (service is up, but needs authentication)
+  #   - 402: Payment Required (service is up, but needs payment)
+  #   - 403: Forbidden (service is up, but access is denied)
+  # 404+: Not Found or Server errors (treat as down)
+  # 000: Timeout/Connection error (service is down)
   
-  # All methods: 404 means endpoint doesn't exist or isn't accessible (treat as down)
-  # 400, 401, 403, 405 indicate service is up but needs proper payload/auth/method
-  if [[ "$response" =~ ^(200|201|204|301|302|400|401|403|405)$ ]]; then
+  # Mark 200-403 as operational (inclusive range)
+  if [[ "$response" =~ ^[0-9]+$ ]] && [ "$response" -ge 200 ] && [ "$response" -le 403 ]; then
     echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
-    echo "operational"
+    echo "operational|$response"
   else
     echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
-    echo "down"
+    echo "down|$response"
   fi
 }
 
@@ -207,6 +210,7 @@ send_slack_notification() {
   local service_name=$1
   local old_status=$2
   local new_status=$3
+  local status_code=${4:-"N/A"}
   local timestamp=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
   
   if [ -z "$SLACK_WEBHOOK_URL" ]; then
@@ -221,15 +225,15 @@ send_slack_notification() {
   if [ "$old_status" = "operational" ] && [ "$new_status" = "down" ]; then
     emoji="🔴"
     title="Service Alert - DOWN"
-    message="*${service_name}* is now *DOWN*\n\nStatus: ${new_status}\nTime: ${timestamp}"
+    message="*${service_name}* is now *DOWN*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
   elif [ "$old_status" = "down" ] && [ "$new_status" = "operational" ]; then
     emoji="🟢"
     title="Service Recovered"
-    message="*${service_name}* is now *OPERATIONAL*\n\nStatus: ${new_status}\nTime: ${timestamp}"
+    message="*${service_name}* is now *OPERATIONAL*\n\nStatus: ${new_status}\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
   else
     emoji="⚠️"
     title="Status Change"
-    message="*${service_name}* status changed from *${old_status}* to *${new_status}*\n\nTime: ${timestamp}"
+    message="*${service_name}* status changed from *${old_status}* to *${new_status}*\n\nHTTP Status Code: ${status_code}\nTime: ${timestamp}"
   fi
   
   # Format Slack message using Block Kit
@@ -299,6 +303,7 @@ previous_status=$(echo "$previous_status_json" | jq -r '.' 2>/dev/null || echo "
 
 # Initialize current status
 declare -A current_status
+declare -A current_status_code
 services_array=()
 
 # Check each API
@@ -311,29 +316,43 @@ for api in "${apis[@]}"; do
   
   # Check current status (pass method and payload if provided)
   if [ -n "$payload" ]; then
-    status=$(check_api "$name" "$url" "$method" "$payload")
+    status_result=$(check_api "$name" "$url" "$method" "$payload")
   elif [ -n "$method" ]; then
-    status=$(check_api "$name" "$url" "$method")
+    status_result=$(check_api "$name" "$url" "$method")
   else
-    status=$(check_api "$name" "$url")
+    status_result=$(check_api "$name" "$url")
   fi
+  
+  # Parse status and statusCode (format: "operational|200" or "down|404")
+  status=$(echo "$status_result" | cut -d'|' -f1)
+  status_code=$(echo "$status_result" | cut -d'|' -f2)
+  
+  # Ensure status_code is a number (handle "000" for timeout)
+  if ! [[ "$status_code" =~ ^[0-9]+$ ]]; then
+    status_code=0
+  fi
+  
+  # Store status with code for comparison
   current_status["$name"]="$status"
+  current_status_code["$name"]="$status_code"
   
-  # Get previous status
+  # Get previous status (format: "operational" or stored separately)
   previous_status_for_api=$(echo "$previous_status" | jq -r ".[\"$name\"] // empty" 2>/dev/null || echo "")
+  # Extract just the status part if it's in old format "operational|200"
+  previous_status_for_api=$(echo "$previous_status_for_api" | cut -d'|' -f1)
   
-  # Compare and send notification if changed
+  # Compare status (not status code, to avoid notifications for same status with different codes)
   if [ -n "$previous_status_for_api" ] && [ "$previous_status_for_api" != "$status" ]; then
-    echo -e "${YELLOW}⚠️  Status changed for $name: $previous_status_for_api → $status${NC}"
-    send_slack_notification "$name" "$previous_status_for_api" "$status"
+    echo -e "${YELLOW}⚠️  Status changed for $name: $previous_status_for_api → $status (HTTP $status_code)${NC}"
+    send_slack_notification "$name" "$previous_status_for_api" "$status" "$status_code"
   elif [ -z "$previous_status_for_api" ]; then
     echo -e "${YELLOW}ℹ️  First check for $name (no notification)${NC}" >&2
   else
-    echo -e "${GREEN}✓ Status unchanged for $name${NC}" >&2
+    echo -e "${GREEN}✓ Status unchanged for $name (HTTP $status_code)${NC}" >&2
   fi
   
-  # Add to services array
-  services_array+=("{\"name\":\"$name\",\"status\":\"$status\"}")
+  # Add to services array with status code
+  services_array+=("{\"name\":\"$name\",\"status\":\"$status\",\"statusCode\":$status_code}")
 done
 
 echo ""
@@ -341,7 +360,7 @@ echo "=========================================="
 echo "Generating status files..."
 echo "=========================================="
 
-# Create current status JSON object
+# Create current status JSON object (store both status and statusCode)
 current_status_json="{"
 first=true
 for name in "${!current_status[@]}"; do
@@ -350,7 +369,7 @@ for name in "${!current_status[@]}"; do
   else
     current_status_json+=","
   fi
-  current_status_json+="\"$name\":\"${current_status[$name]}\""
+  current_status_json+="\"$name\":\"${current_status[$name]}\",\"${name}_code\":${current_status_code[$name]}"
 done
 current_status_json+="}"
 
@@ -379,7 +398,7 @@ echo "Status summary:"
 for name in "${!current_status[@]}"; do
   status_emoji="🟢"
   [ "${current_status[$name]}" = "down" ] && status_emoji="🔴"
-  echo "  $status_emoji $name: ${current_status[$name]}"
+  echo "  $status_emoji $name: ${current_status[$name]} (HTTP ${current_status_code[$name]})"
 done
 echo ""
 
