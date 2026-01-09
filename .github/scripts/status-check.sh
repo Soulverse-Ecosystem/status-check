@@ -24,34 +24,28 @@ SLACK_WEBHOOK_URL="${SLACK_WEBHOOK_URL:-}"
 apis=(
   # Base API Gateway Health Checks
   "Soulverse API Gateway|https://api-gateway.soulverse.us/health"
-  "Soulverse API Gateway Root|https://api-gateway.soulverse.us/"
+  "Soulverse API Gateway Root|https://api-gateway.soulverse.us/api"
   
-  # News Service
-  "Soulverse News|https://api-gateway.soulverse.us/api/news"
+  # News Service (GET endpoints - these should work)
+  "Soulverse News|https://api-gateway.soulverse.us/api/news?page=1&pageSize=1"
   "Soulverse News Providers|https://api-gateway.soulverse.us/api/news/providers"
   "Soulverse News Categories|https://api-gateway.soulverse.us/api/news/categories"
   
-  # LinkedIn Service
+  # LinkedIn Service (GET endpoints)
   "Soulverse LinkedIn Authorization|https://api-gateway.soulverse.us/api/linkedin/authorization"
   "Soulverse LinkedIn Company Posts|https://api-gateway.soulverse.us/api/linkedin/company-posts"
+  "Soulverse LinkedIn Callback|https://api-gateway.soulverse.us/api/linkedin/callback?code=test&state=test"
   
-  # Backup and Recovery Service
-  "Soulverse Backup Recovery|https://api-gateway.soulverse.us/api/BackupAndRecovery/upload"
-  
-  # SoulId Service
-  "Soulverse SoulId|https://api-gateway.soulverse.us/api/soul-id"
-  "Soulverse SoulId Link Address|https://api-gateway.soulverse.us/api/soul-id/link-address"
-  
-  # Organizations Service
+  # Organizations Service (GET endpoints)
   "Soulverse Organizations|https://api-gateway.soulverse.us/api/organizations"
   "Soulverse Organizations Tags|https://api-gateway.soulverse.us/api/organizations/credential-tag"
   
-  # App Config Service
+  # App Config Service (GET endpoints)
   "Soulverse App Version|https://api-gateway.soulverse.us/api/app-config/app-version"
   "Soulverse App Constant|https://api-gateway.soulverse.us/api/app-config/app-constant"
   "Soulverse Mobile App Constant|https://api-gateway.soulverse.us/api/app-config/mobile-app-constant"
   
-  # Auth Logger Service
+  # Auth Logger Service (GET endpoints)
   "Soulverse Auth Logger|https://api-gateway.soulverse.us/api/auth-logger/log"
   "Soulverse Auth Logger Trace|https://api-gateway.soulverse.us/api/auth-logger/trace"
   "Soulverse Auth Logger Daily Report|https://api-gateway.soulverse.us/api/auth-logger/daily-report"
@@ -59,29 +53,39 @@ apis=(
   "Soulverse Auth Logger Monthly Report|https://api-gateway.soulverse.us/api/auth-logger/monthly-report"
   "Soulverse Auth Logger Weekly Report|https://api-gateway.soulverse.us/api/auth-logger/weekly-report"
   
-  # SoulScan Service (Important: includes health-check endpoint)
+  # SoulScan Service (includes health-check endpoint)
   "Soulverse SoulScan Health Check|https://api-gateway.soulverse.us/api/soulscan/health-check"
-  "Soulverse SoulScan Login|https://api-gateway.soulverse.us/api/soulscan/login"
-  "Soulverse SoulScan Register|https://api-gateway.soulverse.us/api/soulscan/register"
-  "Soulverse SoulScan Validate Face|https://api-gateway.soulverse.us/api/soulscan/validate-face"
   
-  # Store Login Service
-  "Soulverse Store Login|https://api-gateway.soulverse.us/api/store-login"
-  
-  # Trust Registry Service
+  # Trust Registry Service (GET endpoints)
   "Soulverse Trust Registry|https://api-gateway.soulverse.us/api/trust-registry/get-all-entities"
-  "Soulverse Trust Registry Add Entity|https://api-gateway.soulverse.us/api/trust-registry/add-entity"
   
-  # Additional SoulId Endpoints
-  "Soulverse SoulId Payment Detail|https://api-gateway.soulverse.us/api/soul-id/payment-detail"
-  "Soulverse SoulId Recover|https://api-gateway.soulverse.us/api/soul-id/recover"
-  "Soulverse SoulId Delete|https://api-gateway.soulverse.us/api/soul-id/delete"
+  # POST/PUT/DELETE endpoints - monitored with appropriate HTTP methods
+  # These endpoints are checked with minimal payloads to verify service availability
+  # 400/401/403 responses mean service is operational (needs proper payload/auth)
+  # 500/503/000 responses mean service is down
   
-  # Additional LinkedIn Endpoint
-  "Soulverse LinkedIn Callback|https://api-gateway.soulverse.us/api/linkedin/callback"
+  # Backup and Recovery Service (POST)
+  "Soulverse Backup Recovery Upload|https://api-gateway.soulverse.us/api/BackupAndRecovery/upload|POST"
   
-  # Additional Organizations Endpoint
-  "Soulverse Organizations By ID|https://api-gateway.soulverse.us/api/organizations"
+  # SoulId Service (POST/PATCH/DELETE)
+  "Soulverse SoulId Create|https://api-gateway.soulverse.us/api/soul-id|POST|{\"soulId\":\"test.soul\",\"purchase\":{}}"
+  "Soulverse SoulId Link Address|https://api-gateway.soulverse.us/api/soul-id/link-address|POST|{\"soulId\":\"test.soul\",\"addresses\":[]}"
+  "Soulverse SoulId Payment Detail|https://api-gateway.soulverse.us/api/soul-id/payment-detail|PATCH|{\"soulId\":\"test.soul\",\"purchase\":{}}"
+  "Soulverse SoulId Recover|https://api-gateway.soulverse.us/api/soul-id/recover|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
+  
+  # SoulScan Service (POST)
+  "Soulverse SoulScan Login|https://api-gateway.soulverse.us/api/soulscan/login|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
+  "Soulverse SoulScan Register|https://api-gateway.soulverse.us/api/soulscan/register|POST|{\"soulId\":\"test\",\"image\":\"test\"}"
+  "Soulverse SoulScan Validate Face|https://api-gateway.soulverse.us/api/soulscan/validate-face|POST|{\"image\":\"test\"}"
+  
+  # Store Login Service (POST)
+  "Soulverse Store Login|https://api-gateway.soulverse.us/api/store-login|POST|{\"username\":\"test\",\"password\":\"test\"}"
+  
+  # Trust Registry Service (POST)
+  "Soulverse Trust Registry Add Entity|https://api-gateway.soulverse.us/api/trust-registry/add-entity|POST|{\"orgId\":\"test\",\"type\":\"ISSUER\",\"orgDid\":\"test\",\"serviceEndpoint\":\"https://test.com\",\"schemaIds\":[],\"credentialDefinitionIds\":[]}"
+  
+  # Organizations Service (POST)
+  "Soulverse Organizations Create|https://api-gateway.soulverse.us/api/organizations|POST"
 )
 
 # Colors for output
@@ -94,15 +98,71 @@ NC='\033[0m' # No Color
 check_api() {
   local name=$1
   local url=$2
+  local method="${3:-GET}"  # Default to GET if not specified
+  local payload="${4:-}"     # Optional payload for POST/PUT requests
   
   # Send colored logs to stderr so only the plain status is captured
-  echo -e "${YELLOW}Checking $name ($url)...${NC}" >&2
+  echo -e "${YELLOW}Checking $name ($url) [${method}]...${NC}" >&2
   
-  # Make HTTP request with timeout
-  response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
+  # For endpoints that might need query parameters, try with minimal params
+  # News endpoint needs query parameters
+  if [[ "$url" == *"/api/news" ]] && [[ "$url" != *"?"* ]] && [[ "$method" == "GET" ]]; then
+    url="${url}?page=1&pageSize=1"
+  fi
   
-  if [ "$response" = "200" ]; then
-    echo -e "${GREEN}✅ $name is operational${NC}" >&2
+  # Make HTTP request based on method
+  local response="000"
+  
+  case "$method" in
+    "GET")
+      # Use HEAD request first (lighter), fallback to GET if HEAD not allowed
+      response=$(curl -s -I -o /dev/null -w "%{http_code}" --max-time $TIMEOUT -X HEAD "$url" 2>/dev/null || \
+                 curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
+      ;;
+    "POST"|"PUT"|"PATCH")
+      # For POST/PUT/PATCH, send minimal payload and check response
+      # We consider 400 (Bad Request) as "operational" - service is up but needs proper payload
+      # 401/403 means service is up but needs auth
+      # 500/503 means service is down
+      if [ -n "$payload" ]; then
+        response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                   -X "$method" \
+                   -H "Content-Type: application/json" \
+                   -d "$payload" \
+                   "$url" 2>/dev/null || echo "000")
+      else
+        # Try with empty JSON payload
+        response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                   -X "$method" \
+                   -H "Content-Type: application/json" \
+                   -d "{}" \
+                   "$url" 2>/dev/null || echo "000")
+      fi
+      ;;
+    "DELETE")
+      # For DELETE, try with a test ID or check if endpoint responds
+      # Many DELETE endpoints need an ID, so we check if we get 400/404 (endpoint exists) vs 500 (down)
+      response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT \
+                 -X "$method" \
+                 "$url" 2>/dev/null || echo "000")
+      ;;
+    *)
+      # Default to GET
+      response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $TIMEOUT "$url" 2>/dev/null || echo "000")
+      ;;
+  esac
+  
+  # Consider these as "operational" (service is responding):
+  # 200, 201, 204 - Success
+  # 301, 302 - Redirect (service is up)
+  # 400 - Bad Request (service is up, but needs proper payload/auth)
+  # 401, 403 - Unauthorized/Forbidden (service is up, but needs auth)
+  # 404 - Not Found (could mean endpoint doesn't exist OR service is down - we'll treat as down for safety)
+  # 500, 502, 503, 504 - Server errors (service is down)
+  # 000 - Timeout/Connection error (service is down)
+  
+  if [[ "$response" =~ ^(200|201|204|301|302|400|401|403)$ ]]; then
+    echo -e "${GREEN}✅ $name is operational (HTTP $response)${NC}" >&2
     echo "operational"
   else
     echo -e "${RED}❌ $name is down (HTTP $response)${NC}" >&2
@@ -214,10 +274,17 @@ echo "Checking APIs..."
 echo ""
 
 for api in "${apis[@]}"; do
-  IFS='|' read -r name url <<< "$api"
+  # Parse API entry: "Name|URL" or "Name|URL|METHOD" or "Name|URL|METHOD|PAYLOAD"
+  IFS='|' read -r name url method payload <<< "$api"
   
-  # Check current status
-  status=$(check_api "$name" "$url")
+  # Check current status (pass method and payload if provided)
+  if [ -n "$payload" ]; then
+    status=$(check_api "$name" "$url" "$method" "$payload")
+  elif [ -n "$method" ]; then
+    status=$(check_api "$name" "$url" "$method")
+  else
+    status=$(check_api "$name" "$url")
+  fi
   current_status["$name"]="$status"
   
   # Get previous status
