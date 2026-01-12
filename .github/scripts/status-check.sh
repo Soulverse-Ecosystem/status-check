@@ -361,8 +361,8 @@ for api in "${apis[@]}"; do
     echo -e "${GREEN}✓ Status unchanged for $name (HTTP $status_code)${NC}" >&2
   fi
   
-  # Add to services array with status code
-  services_array+=("{\"name\":\"$name\",\"status\":\"$status\",\"statusCode\":$status_code}")
+  # Add to services array with status code and URL
+  services_array+=("{\"name\":\"$name\",\"status\":\"$status\",\"statusCode\":$status_code,\"url\":\"$url\"}")
 done
 
 echo ""

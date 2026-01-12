@@ -477,6 +477,121 @@
             background: rgba(102, 126, 234, 0.2);
             transform: scale(1.1);
         }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            animation: slideInRight 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #667eea;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px solid rgba(102, 126, 234, 0.1);
+            text-align: center;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .service-url {
+            font-size: 0.75em;
+            color: #999;
+            margin-top: 5px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            word-break: break-all;
+            display: none;
+        }
+
+        .status-item:hover .service-url {
+            display: block;
+        }
+
+        .copy-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            background: rgba(102, 126, 234, 0.1);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.75em;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .status-item:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
     </style>
 </head>
 <body>
@@ -525,9 +640,31 @@
             <span>Loading status...</span>
         </div>
 
+        <div class="sort-controls">
+            <label for="sort-select" style="color: #666; font-size: 0.9em;">Sort by:</label>
+            <select id="sort-select" class="sort-select">
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="status">Status</option>
+                <option value="category">Category</option>
+            </select>
+        </div>
+
         <ul id="status-list" class="status-list">
             <li class="loading">Loading status...</li>
         </ul>
+
+        <div class="footer">
+            <p>Status page updates every 5 minutes automatically</p>
+            <div class="footer-links">
+                <a href="status.json" target="_blank">API Endpoint</a>
+                <a href="https://github.com/Soulverse-Ecosystem/status-check" target="_blank">GitHub</a>
+                <a href="#" onclick="copyStatusUrl(); return false;">Copy Status Page URL</a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.85em;">
+                Powered by GitHub Actions • Last check: <span id="footer-last-check">-</span>
+            </p>
+        </div>
     </div>
 
     <script>
@@ -587,6 +724,7 @@
                     <span>Last updated: ${date.toLocaleString()}</span>
                     <span style="color: #999; font-size: 0.9em;">(${timeAgo})</span>
                 `;
+                document.getElementById('footer-last-check').textContent = date.toLocaleString();
             }
             
             // Calculate stats
@@ -618,9 +756,58 @@
             return `${days}d ago`;
         }
 
+        function sortServices(services, sortBy) {
+            const sorted = [...services];
+            switch(sortBy) {
+                case 'name-asc':
+                    return sorted.sort((a, b) => a.name.localeCompare(b.name));
+                case 'name-desc':
+                    return sorted.sort((a, b) => b.name.localeCompare(a.name));
+                case 'status':
+                    return sorted.sort((a, b) => {
+                        if (a.status === b.status) return a.name.localeCompare(b.name);
+                        return a.status === 'operational' ? -1 : 1;
+                    });
+                case 'category':
+                    return sorted.sort((a, b) => {
+                        const catA = getServiceCategory(a.name);
+                        const catB = getServiceCategory(b.name);
+                        if (catA === catB) return a.name.localeCompare(b.name);
+                        return catA.localeCompare(catB);
+                    });
+                default:
+                    return sorted;
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.animation = 'slideInRight 0.3s ease-out reverse';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function copyStatusUrl() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                showToast('Status page URL copied to clipboard!', 'success');
+            });
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            });
+        }
+
         function applyFilters() {
             const searchTerm = document.getElementById('search-input').value.toLowerCase();
             const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const sortBy = document.getElementById('sort-select').value;
             const statusList = document.getElementById('status-list');
             
             statusList.innerHTML = '';
@@ -631,10 +818,16 @@
                 return matchesSearch && matchesFilter;
             });
             
+            // Sort services
+            filteredServices = sortServices(filteredServices, sortBy);
+            
             if (filteredServices.length === 0) {
                 statusList.innerHTML = '<li class="no-results">No services found matching your criteria.</li>';
                 return;
             }
+            
+            // Track status changes for notifications
+            const statusChanges = [];
             
             filteredServices.forEach((service, index) => {
                 const li = document.createElement('li');
@@ -653,6 +846,17 @@
                 const previous = previousStatus[service.name];
                 const statusChanged = previous && previous !== service.status;
                 
+                if (statusChanged) {
+                    statusChanges.push({
+                        name: service.name,
+                        from: previous,
+                        to: service.status
+                    });
+                }
+                
+                // Extract URL from service name if possible (for display)
+                const serviceUrl = service.url || '';
+                
                 li.innerHTML = `
                     ${statusChanged ? '<div class="status-change-badge">Changed</div>' : ''}
                     <div class="status-header">
@@ -661,9 +865,20 @@
                     </div>
                     <span class="service-status">${statusText}${statusCodeText}</span>
                     <div class="service-category">${category}</div>
+                    ${serviceUrl ? `<div class="service-url">${serviceUrl}</div>` : ''}
+                    <button class="copy-btn" onclick="copyToClipboard('${service.name}: ${statusText}${statusCodeText}')" title="Copy status">
+                        📋 Copy
+                    </button>
                 `;
                 
                 statusList.appendChild(li);
+            });
+            
+            // Show notifications for status changes
+            statusChanges.forEach(change => {
+                const emoji = change.to === 'operational' ? '🟢' : '🔴';
+                const message = `${emoji} ${change.name}: ${change.from} → ${change.to}`;
+                showToast(message, change.to === 'operational' ? 'success' : 'error');
             });
             
             // Update previous status
@@ -674,6 +889,8 @@
 
         // Event listeners
         document.getElementById('search-input').addEventListener('input', applyFilters);
+        
+        document.getElementById('sort-select').addEventListener('change', applyFilters);
         
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', () => {
