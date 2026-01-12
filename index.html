@@ -66,6 +66,7 @@
             margin-bottom: 40px;
             padding-bottom: 30px;
             border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+            position: relative;
         }
 
         h1 {
@@ -85,6 +86,107 @@
             font-weight: 400;
         }
 
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: 2px solid rgba(102, 126, 234, 0.2);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.95em;
+        }
+
+        .filter-btn:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .refresh-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1em;
+        }
+
+        .refresh-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .refresh-btn:active {
+            transform: translateY(0);
+        }
+
+        .refresh-btn.refreshing {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         .stats-bar {
             display: flex;
             justify-content: space-around;
@@ -100,6 +202,7 @@
             text-align: center;
             flex: 1;
             min-width: 120px;
+            position: relative;
         }
 
         .stat-value {
@@ -109,6 +212,11 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover .stat-value {
+            transform: scale(1.1);
         }
 
         .stat-label {
@@ -127,11 +235,10 @@
             padding: 10px;
             background: rgba(102, 126, 234, 0.05);
             border-radius: 8px;
-        }
-
-        .last-updated::before {
-            content: '🕐 ';
-            margin-right: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .status-list {
@@ -147,6 +254,12 @@
             }
             h1 {
                 font-size: 2em;
+            }
+            .controls-bar {
+                flex-direction: column;
+            }
+            .search-box {
+                width: 100%;
             }
         }
 
@@ -167,9 +280,10 @@
             border-radius: 15px;
             border: 2px solid transparent;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            min-height: 120px;
+            min-height: 140px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .status-item::before {
@@ -271,6 +385,15 @@
             border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
+        .service-category {
+            font-size: 0.75em;
+            color: #888;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
         .loading {
             text-align: center;
             padding: 60px;
@@ -301,35 +424,58 @@
             margin-bottom: 10px;
         }
 
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .no-results {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px;
+            color: #888;
+            font-size: 1.1em;
         }
 
-        .refresh-indicator {
-            display: inline-block;
-            animation: spin 1s linear infinite;
-            margin-left: 10px;
-        }
-
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+        .status-change-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
             padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.85em;
+            border-radius: 6px;
+            font-size: 0.75em;
             font-weight: 600;
+            background: #fbbf24;
+            color: #92400e;
+            animation: slideIn 0.5s ease-out;
         }
 
-        .operational-badge {
-            background: rgba(16, 185, 129, 0.15);
-            color: #059669;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
-        .down-badge {
-            background: rgba(239, 68, 68, 0.15);
-            color: #dc2626;
+        .info-tooltip {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            cursor: help;
+            transition: all 0.3s ease;
+        }
+
+        .info-tooltip:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: scale(1.1);
         }
     </style>
 </head>
@@ -338,6 +484,21 @@
         <div class="header">
             <h1>🚀 API Status Dashboard</h1>
             <p class="subtitle">Real-time monitoring of all Soulverse services</p>
+        </div>
+
+        <div class="controls-bar">
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Search services..." />
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="operational">🟢 Operational</button>
+                <button class="filter-btn" data-filter="down">🔴 Down</button>
+            </div>
+            <button class="refresh-btn" id="refresh-btn" onclick="fetchStatus()">
+                <span>🔄</span>
+                <span>Refresh</span>
+            </button>
         </div>
 
         <div class="stats-bar" id="stats-bar">
@@ -359,7 +520,10 @@
             </div>
         </div>
 
-        <div id="last-updated" class="last-updated">Loading status...</div>
+        <div id="last-updated" class="last-updated">
+            <span>🕐</span>
+            <span>Loading status...</span>
+        </div>
 
         <ul id="status-list" class="status-list">
             <li class="loading">Loading status...</li>
@@ -367,7 +531,14 @@
     </div>
 
     <script>
+        let allServices = [];
+        let previousStatus = {};
+
         async function fetchStatus() {
+            const refreshBtn = document.getElementById('refresh-btn');
+            refreshBtn.classList.add('refreshing');
+            refreshBtn.disabled = true;
+
             try {
                 const response = await fetch('status.json?' + new Date().getTime());
                 
@@ -376,12 +547,31 @@
                 }
                 
                 const data = await response.json();
+                allServices = data.services || [];
                 displayStatus(data);
             } catch (error) {
                 console.error('Error fetching status:', error);
                 document.getElementById('status-list').innerHTML = 
                     '<li class="error">Unable to load status. Please try again later.</li>';
+            } finally {
+                refreshBtn.classList.remove('refreshing');
+                refreshBtn.disabled = false;
             }
+        }
+
+        function getServiceCategory(name) {
+            if (name.includes('News')) return 'News Service';
+            if (name.includes('LinkedIn')) return 'LinkedIn Service';
+            if (name.includes('Organizations')) return 'Organizations';
+            if (name.includes('App Config')) return 'App Config';
+            if (name.includes('Auth Logger')) return 'Auth Logger';
+            if (name.includes('Trust Registry')) return 'Trust Registry';
+            if (name.includes('SoulId')) return 'SoulId Service';
+            if (name.includes('SoulScan')) return 'SoulScan Service';
+            if (name.includes('Backup')) return 'Backup & Recovery';
+            if (name.includes('Store')) return 'Store Service';
+            if (name.includes('API Gateway')) return 'Gateway';
+            return 'Other';
         }
 
         function displayStatus(data) {
@@ -391,74 +581,131 @@
             // Update last updated time
             if (data.updatedAt) {
                 const date = new Date(data.updatedAt);
-                lastUpdated.textContent = `Last updated: ${date.toLocaleString()}`;
+                const timeAgo = getTimeAgo(date);
+                lastUpdated.innerHTML = `
+                    <span>🕐</span>
+                    <span>Last updated: ${date.toLocaleString()}</span>
+                    <span style="color: #999; font-size: 0.9em;">(${timeAgo})</span>
+                `;
             }
             
-            // Clear loading message
-            statusList.innerHTML = '';
-            
             // Calculate stats
-            const services = data.services || [];
+            const services = allServices;
             const operational = services.filter(s => s.status === 'operational').length;
             const down = services.filter(s => s.status === 'down').length;
             const total = services.length;
             const uptime = total > 0 ? Math.round((operational / total) * 100) : 0;
             
-            // Update stats
-            document.getElementById('total-services').textContent = total;
-            document.getElementById('operational-count').textContent = operational;
-            document.getElementById('down-count').textContent = down;
-            document.getElementById('uptime-percent').textContent = uptime + '%';
+            // Update stats with animation
+            animateValue('total-services', total);
+            animateValue('operational-count', operational);
+            animateValue('down-count', down);
+            animateValue('uptime-percent', uptime, '%');
             
-            // Display each service
-            if (services.length > 0) {
-                services.forEach((service, index) => {
-                    const li = document.createElement('li');
-                    li.className = `status-item ${service.status}`;
-                    li.style.animationDelay = `${index * 0.05}s`;
-                    li.style.opacity = '0';
-                    li.style.animation = 'fadeIn 0.5s ease-out forwards';
-                    
-                    const icon = service.status === 'operational' ? '🟢' : '🔴';
-                    const statusText = service.status === 'operational' ? 'Operational' : 'Down';
-                    const statusCode = service.statusCode || 'N/A';
-                    const statusCodeText = statusCode !== 'N/A' ? ` HTTP ${statusCode}` : '';
-                    
-                    li.innerHTML = `
-                        <div class="status-header">
-                            <span class="status-icon">${icon}</span>
-                            <span class="service-name">${service.name}</span>
-                        </div>
-                        <span class="service-status">${statusText}${statusCodeText}</span>
-                    `;
-                    
-                    statusList.appendChild(li);
-                });
-            } else {
-                statusList.innerHTML = '<li class="error">No services found in status data.</li>';
-            }
+            // Apply filters
+            applyFilters();
         }
+
+        function animateValue(id, target, suffix = '') {
+            const element = document.getElementById(id);
+            const current = parseInt(element.textContent) || 0;
+            const increment = target > current ? 1 : -1;
+            const duration = 500;
+            const stepTime = duration / Math.abs(target - current);
+            
+            let currentValue = current;
+            const timer = setInterval(() => {
+                currentValue += increment;
+                element.textContent = currentValue + suffix;
+                if (currentValue === target) {
+                    clearInterval(timer);
+                }
+            }, stepTime);
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return 'just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes}m ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours}h ago`;
+            const days = Math.floor(hours / 24);
+            return `${days}d ago`;
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+            const statusList = document.getElementById('status-list');
+            
+            statusList.innerHTML = '';
+            
+            let filteredServices = allServices.filter(service => {
+                const matchesSearch = service.name.toLowerCase().includes(searchTerm);
+                const matchesFilter = activeFilter === 'all' || service.status === activeFilter;
+                return matchesSearch && matchesFilter;
+            });
+            
+            if (filteredServices.length === 0) {
+                statusList.innerHTML = '<li class="no-results">No services found matching your criteria.</li>';
+                return;
+            }
+            
+            filteredServices.forEach((service, index) => {
+                const li = document.createElement('li');
+                li.className = `status-item ${service.status}`;
+                li.style.animationDelay = `${index * 0.05}s`;
+                li.style.opacity = '0';
+                li.style.animation = 'fadeIn 0.5s ease-out forwards';
+                
+                const icon = service.status === 'operational' ? '🟢' : '🔴';
+                const statusText = service.status === 'operational' ? 'Operational' : 'Down';
+                const statusCode = service.statusCode || 'N/A';
+                const statusCodeText = statusCode !== 'N/A' ? ` HTTP ${statusCode}` : '';
+                const category = getServiceCategory(service.name);
+                
+                // Check for status change
+                const previous = previousStatus[service.name];
+                const statusChanged = previous && previous !== service.status;
+                
+                li.innerHTML = `
+                    ${statusChanged ? '<div class="status-change-badge">Changed</div>' : ''}
+                    <div class="status-header">
+                        <span class="status-icon">${icon}</span>
+                        <span class="service-name">${service.name}</span>
+                    </div>
+                    <span class="service-status">${statusText}${statusCodeText}</span>
+                    <div class="service-category">${category}</div>
+                `;
+                
+                statusList.appendChild(li);
+            });
+            
+            // Update previous status
+            allServices.forEach(service => {
+                previousStatus[service.name] = service.status;
+            });
+        }
+
+        // Event listeners
+        document.getElementById('search-input').addEventListener('input', applyFilters);
+        
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                applyFilters();
+            });
+        });
 
         // Fetch status on page load
         fetchStatus();
         
         // Auto-refresh every 30 seconds
         setInterval(() => {
-            const indicator = document.querySelector('.refresh-indicator');
-            if (indicator) indicator.remove();
             fetchStatus();
         }, 30000);
-
-        // Add refresh indicator
-        setInterval(() => {
-            const lastUpdated = document.getElementById('last-updated');
-            if (!lastUpdated.querySelector('.refresh-indicator')) {
-                const indicator = document.createElement('span');
-                indicator.className = 'refresh-indicator';
-                indicator.textContent = '🔄';
-                lastUpdated.appendChild(indicator);
-            }
-        }, 25000);
     </script>
 </body>
 </html>
