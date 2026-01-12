@@ -596,32 +596,16 @@
             const total = services.length;
             const uptime = total > 0 ? Math.round((operational / total) * 100) : 0;
             
-            // Update stats with animation
-            animateValue('total-services', total);
-            animateValue('operational-count', operational);
-            animateValue('down-count', down);
-            animateValue('uptime-percent', uptime, '%');
+            // Update stats (set directly, no animation to avoid issues)
+            document.getElementById('total-services').textContent = total;
+            document.getElementById('operational-count').textContent = operational;
+            document.getElementById('down-count').textContent = down;
+            document.getElementById('uptime-percent').textContent = uptime + '%';
             
             // Apply filters
             applyFilters();
         }
 
-        function animateValue(id, target, suffix = '') {
-            const element = document.getElementById(id);
-            const current = parseInt(element.textContent) || 0;
-            const increment = target > current ? 1 : -1;
-            const duration = 500;
-            const stepTime = duration / Math.abs(target - current);
-            
-            let currentValue = current;
-            const timer = setInterval(() => {
-                currentValue += increment;
-                element.textContent = currentValue + suffix;
-                if (currentValue === target) {
-                    clearInterval(timer);
-                }
-            }, stepTime);
-        }
 
         function getTimeAgo(date) {
             const seconds = Math.floor((new Date() - date) / 1000);
